@@ -72,7 +72,7 @@ def main():
                     score += 700
                 elif remove_count == 4:
                     score += 1500
-                speed = orispeed - 0.03 * (score // 10000)
+                speed = orispeed - 0.03 * (score // 10)
                 # 消除
                 _i = _j = remove_idxs[-1]
                 while _i >= 0:
@@ -232,7 +232,7 @@ def _draw_info(screen, font, pos_x, font_height, score):
     print_text(screen, font, pos_x, 10, f'POINTS: ')
     print_text(screen, font, pos_x, 10 + font_height + 6, f'{score}')
     print_text(screen, font, pos_x, 20 + (font_height + 6) * 2, f'SPEED: ')
-    print_text(screen, font, pos_x, 20 + (font_height + 6) * 3, f'{score // 10000}')
+    print_text(screen, font, pos_x, 20 + (font_height + 6) * 3, f'{score // 10}')
     print_text(screen, font, pos_x, 30 + (font_height + 6) * 4, f'NEXT: ')
 
 
