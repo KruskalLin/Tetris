@@ -25,13 +25,13 @@ def print_text(screen, font, x, y, text, fcolor=(255, 255, 255)):
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption('俄罗斯方块')
+    pygame.display.set_caption('Tetris')
 
     font1 = pygame.font.SysFont('SimHei', 24)  # 黑体24
     font2 = pygame.font.Font(None, 72)  # GAME OVER 的字体
     font_pos_x = BLOCK_WIDTH * SIZE + BORDER_WIDTH + 10  # 右侧信息显示区域字体位置的X坐标
     gameover_size = font2.size('GAME OVER')
-    font1_height = int(font1.size('得分')[1])
+    font1_height = int(font1.size('POINTS')[1])
 
     cur_block = None   # 当前下落方块
     next_block = None  # 下一个方块
@@ -229,11 +229,11 @@ def _draw_block(screen, block, offset_x, offset_y, pos_x, pos_y):
 
 # 画得分等信息
 def _draw_info(screen, font, pos_x, font_height, score):
-    print_text(screen, font, pos_x, 10, f'得分: ')
+    print_text(screen, font, pos_x, 10, f'POINTS: ')
     print_text(screen, font, pos_x, 10 + font_height + 6, f'{score}')
-    print_text(screen, font, pos_x, 20 + (font_height + 6) * 2, f'速度: ')
+    print_text(screen, font, pos_x, 20 + (font_height + 6) * 2, f'SPEED: ')
     print_text(screen, font, pos_x, 20 + (font_height + 6) * 3, f'{score // 10000}')
-    print_text(screen, font, pos_x, 30 + (font_height + 6) * 4, f'下一个：')
+    print_text(screen, font, pos_x, 30 + (font_height + 6) * 4, f'NEXT: ')
 
 
 if __name__ == '__main__':
