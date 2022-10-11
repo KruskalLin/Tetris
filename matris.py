@@ -210,9 +210,9 @@ class Matris(object):
         while self.blend(position=(posY, posX)):
             posY += 1
 
-        position = (posY - 1, posX)
+        position = (posY - 1, posX)  # hack
 
-        return self.blend(position=position, shadow=True)
+        return self.blend(position=self.tetromino_position, shadow=True)
 
     def fits_in_matrix(self, shape, position):
         """
