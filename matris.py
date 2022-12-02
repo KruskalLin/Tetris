@@ -66,11 +66,11 @@ class Matris(object):
         self.movement_keys_speed = 0.05
         self.movement_keys_timer = (-self.movement_keys_speed) * 2
 
-        # self.level = 1
+        self.steps = 0
         self.score = 0
         self.lines = 0
 
-        self.combo = 1  # Combo will increase when you clear lines with several tetrominos in a row
+        # self.combo = 1  # Combo will increase when you clear lines with several tetrominos in a row
 
         self.paused = False
 
@@ -398,7 +398,8 @@ class Matris(object):
         if lines_cleared:
             # if lines_cleared >= 4:
             #     self.linescleared_sound.play()
-            reward = 100 * (lines_cleared ** 2) * self.combo
+            # reward = 100 * (lines_cleared ** 2) * self.combo
+            reward = 100 * (lines_cleared ** 2)
             self.score += reward
 
             if not self.played_highscorebeaten_sound and self.score > self.highscore:
@@ -410,7 +411,7 @@ class Matris(object):
             # self.levelup_sound.play()
             # self.level += 1
 
-        self.combo = self.combo + 1 if lines_cleared else 1
+        # self.combo = self.combo + 1 if lines_cleared else 1
 
         self.set_tetrominoes()
 
@@ -545,6 +546,9 @@ class Game(object):
     def get_current_state(self):
         return self.matris.get_current_state()
 
+    def set_step(self, steps):
+        self.matris.steps = steps
+
     def reset(self, screen):
         self.matris = Matris(screen)
         self.redraw()
@@ -583,14 +587,14 @@ class Game(object):
             return surf
 
         # Resizes side panel to allow for all information to be display there.
+        stepssurf = renderpair("Steps", self.matris.steps)
         scoresurf = renderpair("Score", self.matris.score)
-        # levelsurf = renderpair("Level", self.matris.level)
         linessurf = renderpair("Lines", self.matris.lines)
-        combosurf = renderpair("Combo", "x{}".format(self.matris.combo))
+        # combosurf = renderpair("Combo", "x{}".format(self.matris.combo))
 
-        height = 20 + (scoresurf.get_rect().height +
-                       linessurf.get_rect().height +
-                       combosurf.get_rect().height)
+        height = 20 + (stepssurf.get_rect().height +
+                       scoresurf.get_rect().height +
+                       linessurf.get_rect().height)
 
         # Colours side panel
         area = Surface((width, height))
@@ -598,11 +602,11 @@ class Game(object):
         area.fill(BGCOLOR, Rect(BORDERWIDTH, BORDERWIDTH, width - BORDERWIDTH * 2, height - BORDERWIDTH * 2))
 
         # Draws side panel
-        # area.blit(levelsurf, (0, 0))
-        area.blit(scoresurf, (0, 0))
-        area.blit(linessurf, (0, scoresurf.get_rect().height))
-        area.blit(combosurf,
-                  (0, scoresurf.get_rect().height + linessurf.get_rect().height))
+        area.blit(stepssurf, (0, 0))
+        area.blit(scoresurf, (0, stepssurf.get_rect().height))
+        area.blit(linessurf, (0, stepssurf.get_rect().height + scoresurf.get_rect().height))
+        # area.blit(combosurf,
+        #           (0, stepssurf.get_rect().height + scoresurf.get_rect().height + linessurf.get_rect().height))
 
         self.screen.blit(area, area.get_rect(bottom=HEIGHT - MATRIS_OFFSET, centerx=TRICKY_CENTERX))
 

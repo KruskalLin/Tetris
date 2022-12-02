@@ -60,6 +60,7 @@ def DQN():
 
         # Game
         while not done and (not max_steps or steps < max_steps):
+            env.set_step(steps)
             next_states = env.get_next_states()
             best_state = agent.best_state(next_states.values())
 
