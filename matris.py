@@ -126,8 +126,7 @@ class Matris(object):
                     block = True
                 if block and matrix[(y + 2, x)] is None:
                     holes += 1
-        print(self.to_matrix(matrix))
-        print(holes)
+
         return holes
 
     def bumpiness(self, matrix):
