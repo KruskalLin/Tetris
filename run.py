@@ -39,7 +39,7 @@ def DQN():
     log_every = 50
     replay_start_size = 2000
     train_every = 1
-    n_neurons = [32, 32]
+    n_neurons = [64, 64]
     activations = ['relu', 'relu', 'linear']
 
     agent = DQNAgent(state_size=4,
@@ -69,7 +69,7 @@ def DQN():
 
             best_action = None
             for action, state in next_states.items():
-                if (state == best_state).all():
+                if state == best_state:
                     best_action = action
                     break
             reward = 0
@@ -77,7 +77,7 @@ def DQN():
                 reward = env.play(best_action[0], best_action[1], render=render)
             except GameOver:
                 done = True
-            if steps != 0:
+            if steps > 0:
                 agent.add_to_memory(current_state, next_states[best_action], reward, done)
             current_state = next_states[best_action]
             steps += 1
