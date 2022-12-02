@@ -180,6 +180,7 @@ class Matris(object):
 
     def get_next_states(self):
         states = {}
+        punishment = {}
         for i in range(4):
             self.tetromino_rotation = i
             # For all positions
@@ -190,15 +191,16 @@ class Matris(object):
                         posY += 1
                     posY -= 1
                     matrix = self.blend(position=(posY, posX))
-                    states[(x, i)] = [self.full_lines(matrix), self.height(matrix), self.bumpiness(matrix), self.holes(matrix)]
-                    # states[(x, i)] = self.to_matrix(matrix)
+                    # states[(x, i)] = [self.full_lines(matrix), self.height(matrix), self.bumpiness(matrix), self.holes(matrix)]
+                    punishment[(x, i)] = - self.height(matrix) - self.bumpiness(matrix) - self.holes(matrix)
+                    states[(x, i)] = self.to_matrix(matrix)
         self.tetromino_rotation = 0
-        return states
+        return states, punishment
 
     def get_current_state(self):
         matrix = self.blend()
-        return [self.full_lines(matrix), self.height(matrix), self.bumpiness(matrix), self.holes(matrix)]
-        # return self.to_matrix(matrix)
+        # return [self.full_lines(matrix), self.height(matrix), self.bumpiness(matrix), self.holes(matrix)]
+        return self.to_matrix(matrix)
 
     def update(self, timepassed):
         """

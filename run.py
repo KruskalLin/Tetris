@@ -7,6 +7,7 @@ from statistics import mean, median
 import random
 from tqdm import tqdm
 
+import numpy as np
 from keras.callbacks import TensorBoard
 # from tensorflow.summary import FileWriter
 
@@ -28,16 +29,16 @@ def DQN():
     pygame.display.set_caption("MaTris")
     env = Game().env(screen)
 
-    episodes = 2000
+    episodes = 40000
     max_steps = None
-    epsilon_stop_episode = 1500
-    mem_size = 20000
+    epsilon_stop_episode = 35000
+    mem_size = 100000
     discount = 0.95
     batch_size = 512
     epochs = 1
     render_every = 1
     log_every = 50
-    replay_start_size = 2000
+    replay_start_size = 5000
     train_every = 1
     n_neurons = [32, 32]
     activations = ['relu', 'relu', 'linear']
@@ -64,17 +65,17 @@ def DQN():
         # Game
         while not done and (not max_steps or steps < max_steps):
             env.set_step(steps)
-            next_states = env.get_next_states()
+            next_states, punishment = env.get_next_states()
             best_state = agent.best_state(next_states.values())
 
             best_action = None
             for action, state in next_states.items():
-                if state == best_state:
+                if (np.array(state) == np.array(best_state)).all():
                     best_action = action
                     break
-            reward = 0
+            reward = punishment[best_action]
             try:
-                reward = env.play(best_action[0], best_action[1], render=render)
+                reward += env.play(best_action[0], best_action[1], render=render)
             except GameOver:
                 done = True
             if steps > 0:
