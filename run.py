@@ -39,7 +39,7 @@ def DQN():
     log_every = 50
     replay_start_size = 2000
     train_every = 1
-    n_neurons = [64, 64]
+    n_neurons = [32, 32]
     activations = ['relu', 'relu', 'linear']
 
     agent = DQNAgent(state_size=4,

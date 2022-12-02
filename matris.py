@@ -124,8 +124,10 @@ class Matris(object):
             for y in range(VISIBLE_MATRIX_HEIGHT):
                 if matrix[(y + 2, x)] is not None:
                     block = True
-                if block and self.matrix[(y + 2, x)] is None:
+                if block and matrix[(y + 2, x)] is None:
                     holes += 1
+        print(self.to_matrix(matrix))
+        print(holes)
         return holes
 
     def bumpiness(self, matrix):
