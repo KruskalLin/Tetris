@@ -35,12 +35,11 @@ def DQN():
     discount = 0.95
     batch_size = 512
     epochs = 1
-    render_every = 50
+    render_every = 1
     log_every = 50
     replay_start_size = 2000
     train_every = 1
     n_neurons = [32, 32]
-    render_delay = None
     activations = ['relu', 'relu', 'linear']
 
     agent = DQNAgent(state_size=4,
@@ -54,14 +53,18 @@ def DQN():
     scores = []
 
     for episode in tqdm(range(episodes)):
-        current_state = env.get_current_state()
+        current_state, matrix = env.get_current_state()
         done = False
         steps = 0
+
+        render = False
+        if episode % render_every == 0:
+            render = True
 
         # Game
         while not done and (not max_steps or steps < max_steps):
             env.set_step(steps)
-            next_states = env.get_next_states()
+            next_states, next_matrices = env.get_next_states()
             best_state = agent.best_state(next_states.values())
 
             best_action = None
@@ -71,17 +74,16 @@ def DQN():
                     break
             reward = 0
             try:
-                reward = env.play(best_action[0], best_action[1])
+                reward = env.play(best_action[0], best_action[1], render=render)
             except GameOver:
                 done = True
-
             agent.add_to_memory(current_state, next_states[best_action], reward, done)
             current_state = next_states[best_action]
             steps += 1
 
         scores.append(env.get_current_score())
         if done:
-            env.reset(screen)
+            env.reset(screen, render=render)
         # Train
         if episode % train_every == 0:
             agent.train(batch_size=batch_size, epochs=epochs)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from time import sleep
 
+import numpy as np
 import pygame
 from pygame import Rect, Surface
 import random
@@ -120,10 +121,10 @@ class Matris(object):
         holes = 0
         for x in range(MATRIX_WIDTH):
             block = False
-            for y in range(MATRIX_HEIGHT):
-                if matrix[(y, x)] is not None:
+            for y in range(VISIBLE_MATRIX_HEIGHT):
+                if matrix[(y + 2, x)] is not None:
                     block = True
-                if block and self.matrix[(y, x)] is not None:
+                if block and self.matrix[(y + 2, x)] is not None:
                     holes += 1
         return holes
 
@@ -132,8 +133,8 @@ class Matris(object):
         min_ys = []
 
         for x in range(MATRIX_WIDTH):
-            for y in range(MATRIX_HEIGHT):
-                if matrix[(y, x)] is not None:
+            for y in range(VISIBLE_MATRIX_HEIGHT):
+                if matrix[(y + 2, x)] is not None:
                     break
             min_ys.append(y)
 
@@ -145,8 +146,8 @@ class Matris(object):
     def height(self, matrix):
         sum_height = 0
         for x in range(MATRIX_WIDTH):
-            for y in range(MATRIX_HEIGHT):
-                if matrix[(y, x)] is not None:
+            for y in range(VISIBLE_MATRIX_HEIGHT):
+                if matrix[(y + 2, x)] is not None:
                     sum_height += VISIBLE_MATRIX_HEIGHT - y
                     break
 
@@ -154,19 +155,27 @@ class Matris(object):
 
     def full_lines(self, matrix):
         lines = []
-        for y in range(MATRIX_HEIGHT):
+        for y in range(VISIBLE_MATRIX_HEIGHT):
             # Checks if row if full, for each row
             line = (y, [])
             for x in range(MATRIX_WIDTH):
-                if matrix[(y, x)]:
+                if matrix[(y + 2, x)] is not None:
                     line[1].append(x)
             if len(line[1]) == MATRIX_WIDTH:
                 lines.append(y)
         return len(lines)
 
+    def to_matrix(self, matrix):
+        mat = np.zeros((VISIBLE_MATRIX_HEIGHT, MATRIX_WIDTH), dtype=np.float)
+        for y in range(VISIBLE_MATRIX_HEIGHT):
+            for x in range(MATRIX_WIDTH):
+                if matrix[(y + 2, x)] is not None:
+                    mat[y, x] = 1.0
+        return mat
+
     def get_next_states(self):
         states = {}
-
+        matrices = {}
         for i in range(4):
             self.tetromino_rotation = i
             # For all positions
@@ -177,13 +186,14 @@ class Matris(object):
                         posY += 1
                     posY -= 1
                     matrix = self.blend(position=(posY, posX))
+                    matrices[(x, i)] = self.to_matrix(matrix)
                     states[(x, i)] = [self.full_lines(matrix), self.height(matrix), self.bumpiness(matrix), self.holes(matrix)]
         self.tetromino_rotation = 0
-        return states
+        return states, matrices
 
     def get_current_state(self):
         matrix = self.blend()
-        return [self.full_lines(matrix), self.height(matrix), self.bumpiness(matrix), self.holes(matrix)]
+        return [self.full_lines(matrix), self.height(matrix), self.bumpiness(matrix), self.holes(matrix)], self.to_matrix(matrix)
 
     def update(self, timepassed):
         """
@@ -432,7 +442,7 @@ class Matris(object):
             # Checks if row if full, for each row
             line = (y, [])
             for x in range(MATRIX_WIDTH):
-                if self.matrix[(y, x)]:
+                if self.matrix[(y, x)] is not None:
                     line[1].append(x)
             if len(line[1]) == MATRIX_WIDTH:
                 lines.append(y)
@@ -527,17 +537,13 @@ class Game(object):
         matris_border.fill(BORDERCOLOR)
         self.screen.blit(matris_border, (MATRIS_OFFSET, MATRIS_OFFSET))
         self.redraw()
-        # while True:
-        #     try:
-        #         self.play(8, 0)
-        #     except GameOver:
-        #         return
         return self
 
-    def play(self, x, rotation):
+    def play(self, x, rotation, render=True):
         self.matris.perform_action(action=(x, rotation))
         reward = self.matris.hard_drop()
-        self.redraw()
+        if render:
+            self.redraw()
         return reward
 
     def get_next_states(self):
@@ -549,9 +555,10 @@ class Game(object):
     def set_step(self, steps):
         self.matris.steps = steps
 
-    def reset(self, screen):
+    def reset(self, screen, render=True):
         self.matris = Matris(screen)
-        self.redraw()
+        if render:
+            self.redraw()
 
     def redraw(self):
         """
