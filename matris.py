@@ -124,7 +124,7 @@ class Matris(object):
             for y in range(VISIBLE_MATRIX_HEIGHT):
                 if matrix[(y + 2, x)] is not None:
                     block = True
-                if block and self.matrix[(y + 2, x)] is not None:
+                if block and self.matrix[(y + 2, x)] is None:
                     holes += 1
         return holes
 
