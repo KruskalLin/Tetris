@@ -1,5 +1,5 @@
 from keras.models import Sequential, save_model, load_model
-from keras.layers import Dense
+from keras.layers import *
 from collections import deque
 import numpy as np
 import random
@@ -13,6 +13,9 @@ import random
 # best final state for the combinations of possible states,
 # in constrast to the traditional way of finding the best
 # action for a particular state.
+from matris import VISIBLE_MATRIX_HEIGHT, MATRIX_WIDTH
+
+
 class DQNAgent:
     '''Deep Q Learning Agent + Maximin
     Args:
@@ -53,12 +56,25 @@ class DQNAgent:
 
     def _build_model(self):
         '''Builds a Keras deep neural network model'''
+        # model = Sequential()
+        # model.add(Dense(self.n_neurons[0], input_dim=self.state_size, activation=self.activations[0]))
+        #
+        # for i in range(1, len(self.n_neurons)):
+        #     model.add(Dense(self.n_neurons[i], activation=self.activations[i]))
+        #
+        # model.add(Dense(1, activation=self.activations[-1]))
+
         model = Sequential()
-        model.add(Dense(self.n_neurons[0], input_dim=self.state_size, activation=self.activations[0]))
-
-        for i in range(1, len(self.n_neurons)):
-            model.add(Dense(self.n_neurons[i], activation=self.activations[i]))
-
+        model.add(Conv2D(32, kernel_size=(3, 3),
+                         activation='relu',
+                         input_shape=(20, 10, 1)))  # image size
+        model.add(Conv2D(64, (3, 3), activation='relu'))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Flatten())
+        model.add(Dropout(0.25))
+        model.add(Flatten())
+        model.add(Dense(128, activation='relu'))
+        model.add(Dropout(0.5))
         model.add(Dense(1, activation=self.activations[-1]))
 
         model.compile(loss=self.loss, optimizer=self.optimizer)
@@ -79,7 +95,9 @@ class DQNAgent:
 
     def act(self, state):
         '''Returns the expected score of a certain state'''
-        state = np.reshape(state, [1, self.state_size])
+        # state = np.reshape(state, [1, self.state_size])
+        state = np.reshape(state, [1, VISIBLE_MATRIX_HEIGHT, MATRIX_WIDTH])
+
         if random.random() <= self.epsilon:
             return self.random_value()
         else:
@@ -92,10 +110,9 @@ class DQNAgent:
 
         if random.random() <= self.epsilon:
             return random.choice(list(states))
-
         else:
             for state in states:
-                value = self.predict_value(np.reshape(state, [1, self.state_size]))
+                value = self.predict_value(np.reshape(state, [1, VISIBLE_MATRIX_HEIGHT, MATRIX_WIDTH]))
                 if not max_value or value > max_value:
                     max_value = value
                     best_state = state
