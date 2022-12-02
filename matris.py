@@ -9,8 +9,6 @@ import os
 from tetrominoes import list_of_tetrominoes
 from tetrominoes import rotate
 
-from scores import load_score, write_score
-
 
 class GameOver(Exception):
     """Exception used for its control flow properties"""
@@ -23,7 +21,7 @@ class GameOver(Exception):
 BGCOLOR = (15, 15, 20)
 BORDERCOLOR = (140, 140, 140)
 
-BLOCKSIZE = 30
+BLOCKSIZE = 15
 BORDERWIDTH = 10
 
 MATRIS_OFFSET = 20
@@ -275,8 +273,6 @@ class Matris(object):
         after a "natural" drop or a hard drop by the player. That is why `self.lock_tetromino`
         is responsible for checking if it's game over.
         """
-
-        # write_score(self.score)
 
         if full_exit:
             exit()

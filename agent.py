@@ -129,7 +129,8 @@ class DQNAgent:
                 y.append(new_q)
 
             # Fit the model to the given values
-            self.model.fit(np.array(x), np.array(y), batch_size=batch_size, epochs=epochs, verbose=0)
+            self.model.fit(np.array(x), np.array(y), batch_size=batch_size, epochs=epochs, verbose=1)
+            self.model.save('checkpoint')
 
             # Update the exploration variable
             if self.epsilon > self.epsilon_min:
