@@ -134,11 +134,14 @@ class Matris(object):
         min_ys = []
 
         for x in range(MATRIX_WIDTH):
+            block = False
             for y in range(VISIBLE_MATRIX_HEIGHT):
                 if matrix[(y + 2, x)] is not None:
+                    block = True
+                    min_ys.append(VISIBLE_MATRIX_HEIGHT - y)
                     break
-            min_ys.append(y)
-
+            if not block:
+                min_ys.append(0)
         for i in range(len(min_ys) - 1):
             total_bumpiness += abs(min_ys[i] - min_ys[i + 1])
 
@@ -164,6 +167,7 @@ class Matris(object):
                     line[1].append(x)
             if len(line[1]) == MATRIX_WIDTH:
                 lines.append(y)
+
         return len(lines)
 
     def to_matrix(self, matrix):
