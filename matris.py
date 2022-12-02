@@ -134,8 +134,8 @@ class Matris(object):
         for x in range(MATRIX_WIDTH):
             for y in range(MATRIX_HEIGHT):
                 if matrix[(y, x)] is not None:
-                    min_ys.append(y)
                     break
+            min_ys.append(y)
 
         for i in range(len(min_ys) - 1):
             total_bumpiness += abs(min_ys[i] - min_ys[i + 1])
