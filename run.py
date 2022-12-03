@@ -31,14 +31,14 @@ def DQN():
 
     episodes = 40000
     max_steps = None
-    epsilon_stop_episode = 35000
+    epsilon_stop_episode = 40000
     mem_size = 100000
     discount = 0.95
     batch_size = 512
     epochs = 1
     render_every = 1
     log_every = 50
-    replay_start_size = 5000
+    replay_start_size = 2000
     train_every = 1
     n_neurons = [32, 32]
     activations = ['relu', 'relu', 'linear']
