@@ -31,8 +31,8 @@ def plot_episode_stats(episode_lengths, episode_rewards, smoothing_window=10, no
     rewards_smoothed = pd.Series(episode_rewards).rolling(smoothing_window, min_periods=smoothing_window).mean()
     plt.plot(rewards_smoothed)
     plt.xlabel("Episode")
-    plt.ylabel("Episode Reward (Smoothed)")
-    plt.title("Episode Reward over Time (Smoothed over window size {})".format(smoothing_window))
+    plt.ylabel("Episode Score (Smoothed)")
+    plt.title("Episode Score over Time (Smoothed over window size {})".format(smoothing_window))
     if noshow:
         plt.close()
     else:
@@ -48,7 +48,7 @@ def DQN():
     pygame.display.set_caption("MaTris")
     env = Game().env(screen)
 
-    episodes = 150
+    episodes = 2000
     max_steps = None
     epsilon_stop_episode = 100
     mem_size = 1000000
@@ -72,7 +72,7 @@ def DQN():
 
     scores = []
     episode_lengths = []
-    episode_rewards = []
+    # episode_rewards = []
 
     for episode in tqdm(range(episodes)):
         current_state = env.get_current_state()
@@ -108,10 +108,10 @@ def DQN():
 
             steps += 1
 
-        total_reward = sum(rewards)
+        # total_reward = mean(rewards)
 
         episode_lengths.append(steps)
-        episode_rewards.append(total_reward)
+        # episode_rewards.append(total_reward)
         scores.append(env.get_current_score())
         if done:
             env.reset(screen, render=render)
@@ -125,9 +125,10 @@ def DQN():
             min_score = min(scores[-log_every:])
             max_score = max(scores[-log_every:])
 
-            print("episode: " + str(episode), "avg_score: " + avg_score, "min_score: " + min_score, "max_score: " + max_score)
+            print("episode: " + str(episode), "avg_score: " + str(avg_score),
+                  "min_score: " + str(min_score), "max_score: " + str(max_score))
 
-    plot_episode_stats(episode_lengths, episode_rewards)
+    plot_episode_stats(episode_lengths, scores)
 
 
 if __name__ == "__main__":
