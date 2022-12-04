@@ -10,16 +10,35 @@ from tqdm import tqdm
 import numpy as np
 from keras.callbacks import TensorBoard
 # from tensorflow.summary import FileWriter
+from matplotlib import pyplot as plt
+import pandas as pd
 
-class CustomTensorBoard(TensorBoard):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+def plot_episode_stats(episode_lengths, episode_rewards, smoothing_window=10, noshow=False):
 
-    def set_model(self, model):
-        pass
+    # Plot the episode length over time
+    fig1 = plt.figure(figsize=(10,5))
+    plt.plot(episode_lengths)
+    plt.xlabel("Episode")
+    plt.ylabel("Episode Length")
+    plt.title("Episode Length over Time")
+    if noshow:
+        plt.close()
+    else:
+        plt.show()
 
-    def log(self, step, **stats):
-        print(stats)
+    # Plot the episode reward over time
+    fig2 = plt.figure(figsize=(10,5))
+    rewards_smoothed = pd.Series(episode_rewards).rolling(smoothing_window, min_periods=smoothing_window).mean()
+    plt.plot(rewards_smoothed)
+    plt.xlabel("Episode")
+    plt.ylabel("Episode Reward (Smoothed)")
+    plt.title("Episode Reward over Time (Smoothed over window size {})".format(smoothing_window))
+    if noshow:
+        plt.close()
+    else:
+        plt.show()
+
+    return fig1, fig2
 
 # Run dqn with Tetris
 def DQN():
@@ -29,7 +48,7 @@ def DQN():
     pygame.display.set_caption("MaTris")
     env = Game().env(screen)
 
-    episodes = 2000
+    episodes = 150
     max_steps = None
     epsilon_stop_episode = 100
     mem_size = 1000000
@@ -48,16 +67,18 @@ def DQN():
                      epsilon_stop_episode=epsilon_stop_episode, mem_size=mem_size,
                      discount=discount, replay_start_size=replay_start_size)
 
-    log_dir = f'logs/tetris-nn={str(n_neurons)}-mem={mem_size}-bs={batch_size}-e={epochs}-{datetime.now().strftime("%Y%m%d-%H%M%S")}'
-    log = CustomTensorBoard(log_dir=log_dir)
+    # log_dir = f'logs/tetris-nn={str(n_neurons)}-mem={mem_size}-bs={batch_size}-e={epochs}-{datetime.now().strftime("%Y%m%d-%H%M%S")}'
+    # log = CustomTensorBoard(log_dir=log_dir)
 
     scores = []
+    episode_lengths = []
+    episode_rewards = []
 
     for episode in tqdm(range(episodes)):
         current_state = env.get_current_state()
         done = False
         steps = 0
-
+        rewards = []
         render = False
         if episode % render_every == 0:
             render = True
@@ -77,20 +98,26 @@ def DQN():
             try:
                 reward += env.play(best_action[0], best_action[1], render=render)
                 # env.play(best_action[0], best_action[1], render=render)
+                rewards.append(reward)
             except GameOver:
                 done = True
                 reward += -1000000
             if steps > 0:
                 agent.add_to_memory(current_state, next_states[best_action], reward, done)
             current_state = next_states[best_action]
+
             steps += 1
 
+        total_reward = sum(rewards)
+
+        episode_lengths.append(steps)
+        episode_rewards.append(total_reward)
         scores.append(env.get_current_score())
         if done:
             env.reset(screen, render=render)
         # Train
         if episode % train_every == 0:
-            agent.train(batch_size=batch_size, epochs=epochs)
+            agent.train(batch_size=batch_size, epochs=epochs, episode=episode)
 
         # Logs
         if log_every and episode and episode % log_every == 0:
@@ -98,8 +125,9 @@ def DQN():
             min_score = min(scores[-log_every:])
             max_score = max(scores[-log_every:])
 
-            log.log(episode, avg_score=avg_score, min_score=min_score,
-                    max_score=max_score)
+            print("episode: " + str(episode), "avg_score: " + avg_score, "min_score: " + min_score, "max_score: " + max_score)
+
+    plot_episode_stats(episode_lengths, episode_rewards)
 
 
 if __name__ == "__main__":

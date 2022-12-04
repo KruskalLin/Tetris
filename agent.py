@@ -33,7 +33,7 @@ class DQNAgent:
     '''
 
     def __init__(self, state_size, mem_size=10000, discount=0.95,
-                 epsilon=1, epsilon_min=0, epsilon_stop_episode=500,
+                 epsilon=1, epsilon_min=0, epsilon_stop_episode=500, replace_every=10,
                  n_neurons=[32, 32], activations=['relu', 'relu', 'linear'],
                  loss='mse', optimizer='adam', replay_start_size=None):
 
@@ -52,7 +52,9 @@ class DQNAgent:
         if not replay_start_size:
             replay_start_size = mem_size / 2
         self.replay_start_size = replay_start_size
+        self.replace_every = replace_every
         self.model = self._build_model()
+        self.baseline = self._build_model()
 
     def _build_model(self):
         '''Builds a Keras deep neural network model'''
@@ -119,7 +121,7 @@ class DQNAgent:
 
         return best_state
 
-    def train(self, batch_size=32, epochs=3):
+    def train(self, batch_size=32, epochs=3, episode=0):
         '''Trains the agent'''
         n = len(self.memory)
 
@@ -129,7 +131,7 @@ class DQNAgent:
 
             # Get the expected score for the next states, in batch (better performance)
             next_states = np.array([x[1] for x in batch])
-            next_qs = [x[0] for x in self.model.predict(next_states)]
+            next_qs = [x[0] for x in self.baseline.predict(next_states)]
 
             x = []
             y = []
@@ -147,7 +149,9 @@ class DQNAgent:
 
             # Fit the model to the given values
             self.model.fit(np.array(x), np.array(y), batch_size=batch_size, epochs=epochs, verbose=0)
-            # self.model.save('checkpoint')
+            if episode % self.replace_every == 0:
+                self.baseline.set_weights(self.model.get_weights())
+                self.model.save('checkpoint.pt')
 
             # Update the exploration variable
             if self.epsilon > self.epsilon_min:

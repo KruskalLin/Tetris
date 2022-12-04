@@ -191,7 +191,7 @@ class Matris(object):
         for i in range(4):
             self.tetromino_rotation = i
             # For all positions
-            for x in range(-6, MATRIX_WIDTH + 6):
+            for x in range(-2, MATRIX_WIDTH - 1):
                 if self.blend(position=(0, x)):
                     posY, posX = 0, x
                     while self.blend(position=(posY, posX)):
