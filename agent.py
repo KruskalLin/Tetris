@@ -96,7 +96,7 @@ class DQNAgent:
     def act(self, state):
         '''Returns the expected score of a certain state'''
         # state = np.reshape(state, [1, self.state_size])
-        state = np.reshape(state, [1, 4])
+        state = np.reshape(state, [1, 6])
 
         if random.random() <= self.epsilon:
             return self.random_value()
@@ -112,7 +112,7 @@ class DQNAgent:
             return random.choice(list(states))
         else:
             for state in states:
-                value = self.predict_value(np.reshape(state, [1, 4]))
+                value = self.predict_value(np.reshape(state, [1, 6]))
                 if not max_value or value > max_value:
                     max_value = value
                     best_state = state

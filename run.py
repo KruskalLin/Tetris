@@ -29,21 +29,21 @@ def DQN():
     pygame.display.set_caption("MaTris")
     env = Game().env(screen)
 
-    episodes = 40000
+    episodes = 2000
     max_steps = None
-    epsilon_stop_episode = 40000
-    mem_size = 100000
-    discount = 0.95
+    epsilon_stop_episode = 100
+    mem_size = 1000000
+    discount = 0.9
     batch_size = 512
     epochs = 1
     render_every = 1
     log_every = 50
     replay_start_size = 2000
     train_every = 1
-    n_neurons = [32, 32]
+    n_neurons = [128, 128]
     activations = ['relu', 'relu', 'linear']
 
-    agent = DQNAgent(state_size=4,
+    agent = DQNAgent(state_size=6,
                      n_neurons=n_neurons, activations=activations,
                      epsilon_stop_episode=epsilon_stop_episode, mem_size=mem_size,
                      discount=discount, replay_start_size=replay_start_size)
@@ -65,7 +65,7 @@ def DQN():
         # Game
         while not done and (not max_steps or steps < max_steps):
             env.set_step(steps)
-            next_states, punishment = env.get_next_states()
+            next_states, punishment = env.get_next_states(steps=steps)
             best_state = agent.best_state(next_states.values())
 
             best_action = None
@@ -76,8 +76,10 @@ def DQN():
             reward = punishment[best_action]
             try:
                 reward += env.play(best_action[0], best_action[1], render=render)
+                # env.play(best_action[0], best_action[1], render=render)
             except GameOver:
                 done = True
+                reward += -1000000
             if steps > 0:
                 agent.add_to_memory(current_state, next_states[best_action], reward, done)
             current_state = next_states[best_action]
