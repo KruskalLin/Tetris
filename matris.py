@@ -148,7 +148,7 @@ class Matris(object):
             total_bumpiness += bumpiness
             max_bumpiness = max(bumpiness, max_bumpiness)
 
-        return total_bumpiness, max_bumpiness
+        return total_bumpiness
 
     def height(self, matrix):
         sum_height = 0
@@ -162,7 +162,7 @@ class Matris(object):
                         max_height = height
                     break
 
-        return sum_height, max_height
+        return sum_height
 
     def full_lines(self, matrix):
         lines = []
@@ -191,15 +191,15 @@ class Matris(object):
         for i in range(4):
             self.tetromino_rotation = i
             # For all positions
-            for x in range(-2, MATRIX_WIDTH - 1):
+            for x in range(-2, MATRIX_WIDTH):
                 if self.blend(position=(0, x)):
                     posY, posX = 0, x
                     while self.blend(position=(posY, posX)):
                         posY += 1
                     posY -= 1
                     matrix = self.blend(position=(posY, posX))
-                    states[(x, i)] = [self.full_lines(matrix), *self.height(matrix), *self.bumpiness(matrix), self.holes(matrix)]
-                    punishment[(x, i)] = 0.76 * self.full_lines(matrix) - 0.51 * self.height(matrix)[0] - 0.18 * self.bumpiness(matrix)[0] - 0.35 * steps * self.holes(matrix)
+                    states[(x, i)] = [self.full_lines(matrix), self.height(matrix), self.bumpiness(matrix), self.holes(matrix)]
+                    punishment[(x, i)] = - self.height(matrix) - self.bumpiness(matrix) - self.holes(matrix)
                     # states[(x, i)] = self.to_matrix(matrix)
         self.tetromino_rotation = 0
         return states, punishment
@@ -423,7 +423,8 @@ class Matris(object):
             # if lines_cleared >= 4:
             #     self.linescleared_sound.play()
             # reward = 100 * (lines_cleared ** 2) * self.combo
-            reward = 100 * (lines_cleared ** 2)
+            # reward = 100 * lines_cleared
+            reward = lines_cleared
             self.score += reward
 
             if not self.played_highscorebeaten_sound and self.score > self.highscore:

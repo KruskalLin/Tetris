@@ -52,17 +52,17 @@ def DQN():
     max_steps = None
     epsilon_stop_episode = 100
     mem_size = 1000000
-    discount = 0.9
-    batch_size = 512
+    discount = 0.0
+    batch_size = 1024
     epochs = 1
     render_every = 1
     log_every = 50
     replay_start_size = 2000
     train_every = 1
-    n_neurons = [128, 128]
-    activations = ['relu', 'relu', 'linear']
+    n_neurons = [32, 32]
+    activations = ['linear', 'linear', 'linear']
 
-    agent = DQNAgent(state_size=6,
+    agent = DQNAgent(state_size=4,
                      n_neurons=n_neurons, activations=activations,
                      epsilon_stop_episode=epsilon_stop_episode, mem_size=mem_size,
                      discount=discount, replay_start_size=replay_start_size)
@@ -72,7 +72,7 @@ def DQN():
 
     scores = []
     episode_lengths = []
-    # episode_rewards = []
+    episode_rewards = []
 
     for episode in tqdm(range(episodes)):
         current_state = env.get_current_state()
@@ -97,21 +97,20 @@ def DQN():
             reward = punishment[best_action]
             try:
                 reward += env.play(best_action[0], best_action[1], render=render)
-                # env.play(best_action[0], best_action[1], render=render)
                 rewards.append(reward)
             except GameOver:
                 done = True
-                reward += -1000000
+                # reward += -10000
             if steps > 0:
-                agent.add_to_memory(current_state, next_states[best_action], reward, done)
+                agent.add_to_memory(current_state, best_action, next_states[best_action], reward, done)
             current_state = next_states[best_action]
 
             steps += 1
 
-        # total_reward = mean(rewards)
+        total_reward = sum(rewards)
 
         episode_lengths.append(steps)
-        # episode_rewards.append(total_reward)
+        episode_rewards.append(total_reward)
         scores.append(env.get_current_score())
         if done:
             env.reset(screen, render=render)
@@ -128,7 +127,7 @@ def DQN():
             print("episode: " + str(episode), "avg_score: " + str(avg_score),
                   "min_score: " + str(min_score), "max_score: " + str(max_score))
 
-    plot_episode_stats(episode_lengths, scores)
+    plot_episode_stats(episode_lengths, episode_rewards)
 
 
 if __name__ == "__main__":
