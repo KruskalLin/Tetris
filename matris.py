@@ -199,7 +199,7 @@ class Matris(object):
                     posY -= 1
                     matrix = self.blend(position=(posY, posX))
                     states[(x, i)] = [self.full_lines(matrix), self.height(matrix), self.bumpiness(matrix), self.holes(matrix)]
-                    punishment[(x, i)] = - self.height(matrix) - self.bumpiness(matrix) - self.holes(matrix)
+                    punishment[(x, i)] = - 0.510066 * self.height(matrix) - 0.184483 * self.bumpiness(matrix) - 0.35663 * self.holes(matrix)
                     # states[(x, i)] = self.to_matrix(matrix)
         self.tetromino_rotation = 0
         return states, punishment
@@ -424,8 +424,8 @@ class Matris(object):
             #     self.linescleared_sound.play()
             # reward = 100 * (lines_cleared ** 2) * self.combo
             # reward = 100 * lines_cleared
-            reward = lines_cleared
-            self.score += reward
+            reward = 0.760666 * lines_cleared
+            self.score += 100 * (lines_cleared ** 2)
 
             if not self.played_highscorebeaten_sound and self.score > self.highscore:
                 # if self.highscore != 0:

@@ -48,19 +48,19 @@ def DQN():
     pygame.display.set_caption("MaTris")
     env = Game().env(screen)
 
-    episodes = 2000
+    episodes = 500
     max_steps = None
     epsilon_stop_episode = 100
     mem_size = 1000000
-    discount = 0.0
-    batch_size = 1024
+    discount = 0.1
+    batch_size = 512
     epochs = 1
     render_every = 1
     log_every = 50
     replay_start_size = 2000
     train_every = 1
     n_neurons = [32, 32]
-    activations = ['linear', 'linear', 'linear']
+    activations = ['relu', 'relu', 'linear']
 
     agent = DQNAgent(state_size=4,
                      n_neurons=n_neurons, activations=activations,
@@ -127,7 +127,9 @@ def DQN():
             print("episode: " + str(episode), "avg_score: " + str(avg_score),
                   "min_score: " + str(min_score), "max_score: " + str(max_score))
 
-    plot_episode_stats(episode_lengths, episode_rewards)
+    plot_episode_stats(episode_lengths, scores)
+    # np.save('episode_lengths_10505025.npy', np.array(episode_lengths))
+    # np.save('scores_10505025.npy', np.array(scores))
 
 
 if __name__ == "__main__":
