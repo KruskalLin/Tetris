@@ -48,7 +48,7 @@ def DQN():
     pygame.display.set_caption("MaTris")
     env = Game().env(screen)
 
-    episodes = 500
+    episodes = 300
     max_steps = None
     epsilon_stop_episode = 100
     mem_size = 1000000
@@ -128,8 +128,8 @@ def DQN():
                   "min_score: " + str(min_score), "max_score: " + str(max_score))
 
     plot_episode_stats(episode_lengths, scores)
-    # np.save('episode_lengths_10505025.npy', np.array(episode_lengths))
-    # np.save('scores_10505025.npy', np.array(scores))
+    # np.save('episode_lengths_optimal_0.9.npy', np.array(episode_lengths))
+    # np.save('scores_optimal_0.9.npy', np.array(scores))
 
 
 if __name__ == "__main__":

@@ -679,4 +679,4 @@ if __name__ == '__main__':
 
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("MaTris")
-    Game().env(screen)
+    Game().main(screen)
